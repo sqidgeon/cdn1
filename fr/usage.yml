@@ -1,0 +1,23 @@
+timestamp: '2026-06-13T08:39:42.975Z'
+system:
+  platform: linux
+  arch: x64
+  uptime_hours: '161.72'
+cpu:
+  usage_percent: '9.37'
+  cores: 6
+ram:
+  total_gb: '11.68'
+  used_gb: '3.59'
+  free_gb: '8.08'
+  usage_percent: '30.78'
+disk:
+  total_gb: '122.92'
+  used_gb: '49.44'
+  free_gb: '68.37'
+  usage_percent: '40.22'
+network:
+  inbound_bytes: 10070124
+  outbound_bytes: 7199551188
+  inbound_mb: '9.60'
+  outbound_mb: '6866.03'

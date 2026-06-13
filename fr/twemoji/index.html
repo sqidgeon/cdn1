@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Twemoji Browser</title>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 20px;
+      background: #f6f6f6;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 12px;
+    }
+
+    .item {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      font-size: 10px;
+      word-break: break-word;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .item img {
+      width: 40px;
+      height: 40px;
+      display: block;
+      margin: 0 auto 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Twemoji SVG Browser</h1>
+  <input id="search" placeholder="Search emoji filename..." />
+  <div id="grid" class="grid"></div>
+
+  <script>
+    const BASE_URL = "https://fr.sqidgeon.uk/twemoji/svg/";
+
+    let files = [];
+
+    async function loadIndex() {
+      try {
+        const res = await fetch(BASE_URL);
+        const html = await res.text();
+
+        const doc = new DOMParser().parseFromString(html, "text/html");
+
+        const links = [...doc.querySelectorAll("a")];
+
+        files = links
+          .map(a => a.getAttribute("href"))
+          .filter(h => h && h.endsWith(".svg"))
+          .map(h => h.split("/").pop());
+
+        render(files);
+
+      } catch (err) {
+        document.getElementById("grid").innerHTML =
+          "<p>Could not load directory listing (CORS or indexing disabled).</p>";
+        console.error(err);
+      }
+    }
+
+    function render(list) {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+
+      list.forEach(file => {
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const url = new URL(file, BASE_URL).href;
+
+        div.innerHTML = `
+          <img src="${url}" loading="lazy" />
+          <div>${file.replace(".svg","")}</div>
+        `;
+
+        grid.appendChild(div);
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", (e) => {
+      const q = e.target.value.toLowerCase();
+      render(files.filter(f => f.toLowerCase().includes(q)));
+    });
+
+    loadIndex();
+  </script>
+</body>
+</html>

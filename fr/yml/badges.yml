@@ -1,0 +1,74 @@
+- img: "https://fr.sqidgeon.uk/images/badges/badge.png"
+  link: "https://sqidgeon.uk/"
+  alt: "Kevin badge"
+  title: "Kevin"
+
+- img: "https://fr.sqidgeon.uk/images/badges/debian.webp"
+  link: "https://www.debian.org/"
+  alt: "Debian badge"
+  title: "Powered by Debian"
+
+- img: "https://fr.sqidgeon.uk/images/badges/nginx.gif"
+  link: "https://nginx.org"
+  alt: "Nginx badge"
+  title: "Powered by Nginx"
+
+- img: "https://assets.c48.uk/buttons/wilbur.avif"
+  link: "https://c48.uk/"
+  alt: "Wilbur badge"
+  title: "Wilbur"
+
+- img: "https://electron271.gay/88x31/badgev1.webp"
+  link: "https://electron271.gay/"
+  alt: "electron271 badge"
+  title: "electron271"
+
+- img: "https://assets.c48.uk/buttons/wes.avif"
+  link: "https://wesbryie.com"
+  alt: "Wesbryie badge"
+  title: "Wesbryie"
+
+- img: "https://notnite.com/buttons/docker.png"
+  link: "https://www.docker.com"
+  alt: "Docker badge"
+  title: "Powered by Docker"
+
+- img: "https://notnite.com/buttons/vlc.png"
+  link: "https://www.videolan.org"
+  alt: "VLC badge"
+  title: "VLC"
+
+- img: "https://notnite.com/buttons/jellyfin.gif"
+  link: "https://jellyfin.org"
+  alt: "Jellyfin badge"
+  title: "Jellyfin"
+
+- img: "https://notnite.com/buttons/linux.gif"
+  link: "https://distrowatch.com"
+  alt: "Distrowatch badge"
+  title: "Distrowatch"
+
+- img: "https://assets.c48.uk/buttons/eightyeightthirtyone.png"
+  link: "https://eightyeightthirty.one"
+  alt: "eightyeightthirty badge"
+  title: "eightyeightthirty"
+
+- img: "https://fr.sqidgeon.uk/images/badges/kde.png"
+  link: "https://kde.org"
+  alt: "kde badge"
+  title: "kde"
+
+- img: "https://fr.sqidgeon.uk/images/badges/linux.gif"
+  link: "https://www.linux.org"
+  alt: "linux badge"
+  title: "linux"
+
+- img: "https://fr.sqidgeon.uk/images/badges/vivaldi.gif"
+  link: "https://vivaldi.com"
+  alt: "vivaldi badge"
+  title: "vivaldi"
+
+- img: "https://fr.sqidgeon.uk/images/badges/lttstore.gif"
+  link: "https://www.lttstore.com"
+  alt: "lttstore badge"
+  title: "lttstore"

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Badge Database · sqidgeon.uk</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #131517 0%, #1a1c1e 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Times New Roman', serif;
+            color: #e8e2d4;
+            line-height: 1.5;
+            padding: 1.5rem;
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e2124;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a4032;
+            border-radius: 10px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #e2cfb0, #c4a36d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+        }
+        .credits {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.3rem;
+            font-size: 0.85rem;
+            color: #9b8e78;
+        }
+        .credits a {
+            color: #d4a259;
+            text-decoration: none;
+        }
+        .credits a:hover {
+            text-decoration: underline;
+        }
+        .credits span {
+            color: #6c6252;
+        }
+
+        /* search panel */
+        .search-panel {
+            background: rgba(30, 32, 36, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 48px;
+            padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border: 1px solid #2f2b24;
+        }
+        .search-wrapper {
+            flex: 2;
+            min-width: 200px;
+        }
+        .search-input {
+            width: 100%;
+            background: #1b1d20;
+            border: 1px solid #3a342c;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', monospace;
+            color: #f0e4cf;
+            border-radius: 40px;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #b3905a;
+            background: #212428;
+        }
+        .stats-badge {
+            background: #242527;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #bcad8b;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+
+        /* grid – wider columns */
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0;
+        }
+
+        /* rectangular card */
+        .badge-card {
+            background: #1e2125;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: 1px solid #2f2b24;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .badge-card:hover {
+            transform: translateY(-5px);
+            border-color: #b3905a;
+            box-shadow: 0 15px 25px -10px rgba(0, 0, 0, 0.3);
+        }
+        .badge-img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: contain;
+            background: #131517;
+            padding: 0.8rem;
+        }
+        .badge-name {
+            padding: 0.7rem 0.5rem 0.9rem;
+            font-size: 0.7rem;
+            font-family: monospace;
+            font-weight: 500;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid #2c2822;
+            color: #cfc3ae;
+            word-break: break-word;
+        }
+
+        /* load more button */
+        .load-more-container {
+            text-align: center;
+            margin: 1.5rem 0 2rem;
+        }
+        .load-more-btn {
+            background: #2a2c2e;
+            border: 1px solid #4f4436;
+            padding: 0.7rem 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: inherit;
+            color: #e2cfb0;
+            cursor: pointer;
+            border-radius: 60px;
+            transition: 0.2s;
+        }
+        .load-more-btn:hover:not(:disabled) {
+            background: #4a3f2e;
+            border-color: #d4a259;
+            color: #fef0da;
+            transform: scale(1.02);
+        }
+        .load-more-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            background: #261e1a;
+            border-left: 5px solid #c75c3c;
+            padding: 1rem 1.5rem;
+            border-radius: 24px;
+            color: #e6aa8a;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6c6252;
+            border-top: 1px solid #2b2721;
+            padding-top: 1rem;
+        }
+
+        /* Modal with QR */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: #1c1e22;
+            border: 1px solid #b3905a;
+            border-radius: 36px;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.4);
+        }
+        .modal-content h3 {
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+            color: #e2cfb0;
+        }
+        .modal-url {
+            word-break: break-all;
+            background: rgba(0,0,0,0.3);
+            padding: 0.6rem;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            margin: 1rem 0;
+        }
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin: 0.5rem 0 1rem;
+        }
+        .modal-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+        .modal-buttons button {
+            background: #2a2c2e;
+            border: 1px solid #4f4436;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            color: #e2cfb0;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .modal-buttons button:hover {
+            background: #4a3f2e;
+            color: #fef0da;
+        }
+        .close-modal {
+            float: right;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: #9b8e78;
+            line-height: 1;
+        }
+        .close-modal:hover {
+            color: #e2cfb0;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .badge-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+            .search-panel { flex-direction: column; align-items: stretch; border-radius: 28px; padding: 1rem; }
+            .stats-badge { text-align: center; white-space: normal; }
+            .modal-content { width: 95%; padding: 1rem; }
+            .qr-container canvas, .qr-container img { max-width: 160px; height: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Badge Database</h1>
+        <div class="credits">
+            <span>Badge designs by <a href="https://intergrav.github.io/devins-badges-docs/" target="_blank" rel="noopener noreferrer">Devin</a></span>
+            <span>•</span>
+            <span>Website by <a href="https://sqidgeon.uk" target="_blank" rel="noopener noreferrer">sqidgeon.uk</a></span>
+        </div>
+    </div>
+
+    <div class="search-panel">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="filter by name or folder..." autocomplete="off">
+        </div>
+        <div class="stats-badge" id="statsBar">loading badges...</div>
+    </div>
+
+    <div class="badge-grid" id="badgeGrid"></div>
+
+    <div class="load-more-container">
+        <button class="load-more-btn" id="loadMoreBtn" style="display: none;">load more (50)</button>
+    </div>
+
+    <footer>
+        data: <code>file-list.json</code> (same folder) &nbsp;|&nbsp; click badge -> copy url + qr code
+    </footer>
+</div>
+
+<!-- Modal with QR code -->
+<div id="urlModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>badge url</h3>
+        <div class="modal-url" id="modalUrl"></div>
+        <div class="qr-container" id="qrCodeContainer"></div>
+        <div class="modal-buttons">
+            <button id="copyUrlBtn">copy to clipboard</button>
+            <button id="closeModalBtn">close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BASE_CDN = 'https://raw.githubusercontent.com/sqidgeon/cdn1/main/';
+    const badgeGrid = document.getElementById('badgeGrid');
+    const statsBar = document.getElementById('statsBar');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const searchInput = document.getElementById('searchInput');
+    const modal = document.getElementById('urlModal');
+    const modalUrlSpan = document.getElementById('modalUrl');
+    const qrContainer = document.getElementById('qrCodeContainer');
+    const copyBtn = document.getElementById('copyUrlBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const closeSpan = document.querySelector('.close-modal');
+
+    let allBadges = [];
+    let filteredBadges = [];
+    let currentIndex = 0;
+    const PAGE_SIZE = 50;
+
+    function normalizePath(p) { return p.replace(/\\/g, '/'); }
+
+    async function loadBadgeList() {
+        try {
+            const response = await fetch('file-list.json');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if (!Array.isArray(data)) throw new Error('invalid json');
+
+            const imageExtensions = ['.png', '.svg', '.jpg', '.jpeg', '.gif', '.webp'];
+            const imagePaths = data.filter(p => imageExtensions.some(ext => p.toLowerCase().endsWith(ext)));
+            if (imagePaths.length === 0) throw new Error('no images found');
+
+            allBadges = imagePaths.map(path => {
+                const normalized = normalizePath(path);
+                const fullUrl = BASE_CDN + normalized;
+                const filename = normalized.split('/').pop();
+                const name = filename.replace(/\.[^/.]+$/, '');
+                const folder = normalized.split('/').slice(0, -1).join('/') || 'root';
+                const searchText = `${name} ${folder} ${normalized}`.toLowerCase();
+                return { path: normalized, fullUrl, name, folder, searchText };
+            });
+            statsBar.innerText = `${allBadges.length} badges loaded — use search`;
+            applySearchAndReset();
+        } catch (err) {
+            console.error(err);
+            statsBar.innerText = `error: ${err.message}`;
+            badgeGrid.innerHTML = `<div class="error-msg">could not load file-list.json. ensure it exists in the same folder.</div>`;
+        }
+    }
+
+    function filterBadges() {
+        const term = searchInput.value.trim().toLowerCase();
+        filteredBadges = term === '' ? [...allBadges] : allBadges.filter(b => b.searchText.includes(term));
+        return filteredBadges;
+    }
+
+    function applySearchAndReset() {
+        filterBadges();
+        currentIndex = 0;
+        badgeGrid.innerHTML = '';
+        loadMoreBtn.style.display = 'none';
+        renderNextPage();
+    }
+
+    function renderNextPage() {
+        const nextBatch = filteredBadges.slice(currentIndex, currentIndex + PAGE_SIZE);
+        if (nextBatch.length === 0) {
+            if (currentIndex === 0 && filteredBadges.length === 0)
+                badgeGrid.innerHTML = '<div class="error-msg">no badges match your filter.</div>';
+            loadMoreBtn.style.display = 'none';
+            statsBar.innerText = `${filteredBadges.length} total badges · all shown`;
+            return;
+        }
+
+        for (const badge of nextBatch) {
+            const card = document.createElement('div');
+            card.className = 'badge-card';
+            const img = document.createElement('img');
+            img.src = badge.fullUrl;
+            img.alt = badge.name;
+            img.loading = 'lazy';
+            img.className = 'badge-img';
+            img.onerror = () => {
+                img.style.display = 'none';
+                const fallback = document.createElement('div');
+                fallback.className = 'badge-img';
+                fallback.style.display = 'flex';
+                fallback.style.alignItems = 'center';
+                fallback.style.justifyContent = 'center';
+                fallback.style.backgroundColor = '#1b1d20';
+                fallback.style.color = '#b0875a';
+                fallback.style.fontSize = '0.7rem';
+                fallback.innerText = 'missing';
+                card.prepend(fallback);
+            };
+            const label = document.createElement('div');
+            label.className = 'badge-name';
+            label.textContent = badge.name;
+            card.appendChild(img);
+            card.appendChild(label);
+            card.addEventListener('click', () => showModal(badge.fullUrl));
+            badgeGrid.appendChild(card);
+        }
+
+        currentIndex += nextBatch.length;
+        const remaining = filteredBadges.length - currentIndex;
+        if (remaining <= 0) {
+            loadMoreBtn.style.display = 'none';
+            statsBar.innerText = `${filteredBadges.length} badges shown · end of list`;
+        } else {
+            loadMoreBtn.style.display = 'inline-block';
+            statsBar.innerText = `${filteredBadges.length} matches · showing ${currentIndex} of ${filteredBadges.length} · load ${Math.min(PAGE_SIZE, remaining)} more`;
+        }
+    }
+
+    function showModal(url) {
+        modalUrlSpan.innerText = url;
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, {
+            text: url,
+            width: 180,
+            height: 180,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.L
+        });
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        qrContainer.innerHTML = '';
+    }
+
+    copyBtn.addEventListener('click', () => {
+        const url = modalUrlSpan.innerText;
+        navigator.clipboard.writeText(url).then(() => {
+            copyBtn.innerText = 'copied!';
+            setTimeout(() => { copyBtn.innerText = 'copy to clipboard'; }, 1500);
+        }).catch(() => alert('could not copy'));
+    });
+    closeModalBtn.addEventListener('click', closeModal);
+    closeSpan.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    loadMoreBtn.addEventListener('click', renderNextPage);
+    searchInput.addEventListener('input', applySearchAndReset);
+
+    loadBadgeList();
+</script>
+</body>
+</html>
